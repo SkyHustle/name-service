@@ -13,6 +13,15 @@ type Keeper struct {
 	cdc 		   *codec.Codec // The wire codec for binary encoding/decoding.
 }
 
+// Sets the entire Whois metadata struct for a name
+func (k Keeper) SetWhois(ctx sdk.Context, name string, whois types.Whois) {
+	if whois.Owner.Empty() {
+		return
+	}
+	store := ctx.KVStore(k.storeKey)
+	store.Set([]byte(name), k.cdc.MustMarshalBinaryBare(whois))
+}
+
 
 
 
