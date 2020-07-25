@@ -87,6 +87,13 @@ func (k Keeper) IsNamePresent(ctx sdk.Context, name string) bool {
 	return store.Has([]byte(name))
 }
 
+// Get an iterator over all names in which the keys are the names and the values are the whois
+func (k Keeper) GetNamesIterator(ctx sdk.Context) sdk.Iterator {
+	store := ctx.KVStore(k.storeKey)
+	return sdk.KVStorePrefixIterator(store, []byte{})
+}
+
+
 
 
 
