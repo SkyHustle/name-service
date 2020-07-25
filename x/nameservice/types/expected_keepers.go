@@ -1,3 +1,4 @@
+// In this file we are defining what we expect other modules to have
 package types
 
 import (
