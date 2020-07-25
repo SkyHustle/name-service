@@ -38,3 +38,8 @@ func (msg MsgSetName) ValidateBasic() error {
 	}
 	return nil
 }
+
+// GetSignBytes encodes the message for signing
+func (msg MsgSetName) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
+}
