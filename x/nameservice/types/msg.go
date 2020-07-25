@@ -27,3 +27,14 @@ func (msg MsgSetName) Route() string { return RouterKey }
 
 // Type should return the action
 func (msg MsgSetName) Type() string { return "set_name" }
+
+// ValidateBasic runs stateless checks on the message
+func (msg MsgSetName) ValidateBasic() error {
+	if msg.Owner.Empty() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
+	}
+	if len(msg.Name) == 0 || len(msg.Value) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "Name and/or Value cannot be empty")
+	}
+	return nil
+}
