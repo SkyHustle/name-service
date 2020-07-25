@@ -43,3 +43,8 @@ func (msg MsgSetName) ValidateBasic() error {
 func (msg MsgSetName) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
+
+// GetSigners defines whose signature is required
+func (msg MsgSetName) GetSigners() []sdk.AccAddress {
+	return []sdk.AccAddress{msg.Owner}
+}
