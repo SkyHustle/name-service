@@ -8,9 +8,18 @@ import (
 
 // Keeper maintains the link to data storage and exposes getter/setter methods for the various parts of the state machine
 type Keeper struct {
-	CoinKeeper types.BankKeeper
-	storeKey   sdk.StoreKey // Unexposed key to access store from sdk.Context
 	cdc 		   *codec.Codec // The wire codec for binary encoding/decoding.
+	storeKey   sdk.StoreKey // Unexposed key to access store from sdk.Context
+	CoinKeeper types.BankKeeper
+}
+
+// NewKeeper creates new instances of the nameservice Keeper
+func NewKeeper(cdc *codec.Codec, storeKey sdk.StoreKey, coinKeeper types.BankKeeper) Keeper {
+	return Keeper{
+		cdc:        cdc,
+		storeKey:   storeKey,
+		CoinKeeper: coinKeeper,
+	}
 }
 
 // Sets the entire Whois metadata struct for a name
