@@ -30,3 +30,48 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		}
 	}
 }
+
+// nolint: unparam
+func queryResolve(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
+	value := keeper.ResolveName(ctx, path[0])
+
+	if value == "" {
+		return []byte{}, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "could not resolve name")
+	}
+
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.QueryResResolve{Value: value})
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+	}
+
+	return res, nil
+}
+
+// nolint: unparam
+func queryWhois(ctx sdk.Context, path []string, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
+	whois := keeper.GetWhois(ctx, path[0])
+
+	res, err := codec.MarshalJSONIndent(keeper.cdc, whois)
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+	}
+
+	return res, nil
+}
+
+func queryNames(ctx sdk.Context, req abci.RequestQuery, keeper Keeper) ([]byte, error) {
+	var namesList types.QueryResNames
+
+	iterator := keeper.GetNamesIterator(ctx)
+
+	for ; iterator.Valid(); iterator.Next() {
+		namesList = append(namesList, string(iterator.Key()))
+	}
+
+	res, err := codec.MarshalJSONIndent(keeper.cdc, namesList)
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+	}
+
+	return res, nil
+}
