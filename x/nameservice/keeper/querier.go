@@ -1,40 +1,32 @@
 package keeper
 
 import (
-	"fmt"
-
-	abci "github.com/tendermint/tendermint/abci/types"
-
-	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/sdk-tutorials/nameservice/x/nameservice/types"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/Dmitry1007/name-service/x/nameservice/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-// NewQuerier creates a new querier for nameservice clients.
-func NewQuerier(k Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
+// query endpoints supported by the nameservice Querier
+const (
+	QueryResolve = "resolve"
+	QueryWhois   = "whois"
+	QueryNames   = "names"
+)
+
+// NewQuerier is the module level router for state queries
+func NewQuerier(keeper Keeper) sdk.Querier {
+	return func(ctx sdk.Context, path []string, req abci.RequestQuery) (res []byte, err error) {
 		switch path[0] {
-		case types.QueryParams:
-			return queryParams(ctx, k)
-			// TODO: Put the modules query routes
+		case QueryResolve:
+			return queryResolve(ctx, path[1:], req, keeper)
+		case QueryWhois:
+			return queryWhois(ctx, path[1:], req, keeper)
+		case QueryNames:
+			return queryNames(ctx, req, keeper)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown nameservice query endpoint")
 		}
 	}
 }
-
-func queryParams(ctx sdk.Context, k Keeper) ([]byte, error) {
-	params := k.GetParams(ctx)
-
-	res, err := codec.MarshalJSONIndent(types.ModuleCdc, params)
-	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
-	}
-
-	return res, nil
-}
-
-// TODO: Add the modules query functions
-// They will be similar to the above one: queryParams()
